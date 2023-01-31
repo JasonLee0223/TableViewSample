@@ -56,18 +56,25 @@ class sampleTableViewDataSource: NSObject, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellIdentifier = "tableVIewCell"
+        let cellIdentifier = indexPath.row == 0 ? "tableVIewCell" : "detailCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         
-        //MARK: - https://zeddios.tistory.com/1206 1205번도 봐야한다! textLabel 14이상에서 지원X
-        //cell.textLabel?.text = "\(indexPath.section), \(indexPath.row)"
-        var cellContent = cell.defaultContentConfiguration()
-        cellContent.text = "\(indexPath.section), \(indexPath.row)"
-        cell.contentConfiguration = cellContent
-        
-        
+        cell.configurationUpdateHandler = { cell, state in
+            var cellContent = cell.defaultContentConfiguration().updated(for: state)
+            cellContent.text = "\(indexPath.section), \(indexPath.row)"
+            
+            var cellBackgroundConfig = UIBackgroundConfiguration.listPlainCell()
+            if indexPath.row == 0 {
+                cellBackgroundConfig.backgroundColor = .systemPink
+            }
+            
+            if state.isDisabled {
+                cellContent.textProperties.color = .blue
+            }
+            
+            cell.contentConfiguration = cellContent
+            cell.backgroundConfiguration = cellBackgroundConfig
+        }
         return cell
     }
-    
-    
 }
